@@ -11,6 +11,7 @@
         "psr-4": {
             "SolutionORM\\": "",
             "SolutionORM\\Controllers\\": "src/Controllers/",
+            "SolutionORM\\Controllers\\Cache\\": "src/Controllers/Cache/",
             "SolutionORM\\Interfaces\\": "src/Interfaces/"
         }
 

@@ -2,9 +2,9 @@
 
 namespace SolutionORM\Controllers\Cache;
 
-use SolutionORM\Interfaces\Cache;
+use SolutionORM\Interfaces\CacheInterface;
 
-class CacheIncludeController implements Cache {
+class CacheIncludeController implements CacheInterface {
 
     private $filename, $data = array();
 

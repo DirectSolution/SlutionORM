@@ -8,7 +8,7 @@ class MultiResultController extends ResultController{
    	private $result, $column, $active;
 	
 	/** @access protected must be public because it is called from Row */
-	function __construct($table, Result $result, $column, $active) {
+	function __construct($table, ResultController $result, $column, $active) {
 		parent::__construct($table, $result->notORM);
 		$this->result = $result;
 		$this->column = $column;
@@ -29,7 +29,7 @@ class MultiResultController extends ResultController{
 	function insert_multi(array $rows) {
 		$args = array();
 		foreach ($rows as $data) {
-			if ($data instanceof Traversable && !$data instanceof Result) {
+			if ($data instanceof Traversable && !$data instanceof ResultController) {
 				$data = iterator_to_array($data);
 			}
 			if (is_array($data)) {

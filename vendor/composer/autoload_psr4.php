@@ -6,6 +6,8 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'SolutionORM\\Source\\' => array($baseDir . '/src'),
+    'SolutionORM\\Interfaces\\' => array($baseDir . '/src/Interfaces'),
+    'SolutionORM\\Controllers\\Cache\\' => array($baseDir . '/src/Controllers/Cache'),
+    'SolutionORM\\Controllers\\' => array($baseDir . '/src/Controllers'),
     'SolutionORM\\' => array($baseDir . '/'),
 );

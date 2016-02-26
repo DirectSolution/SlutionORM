@@ -2,9 +2,9 @@
 
 namespace SolutionORM\Controllers\Cache;
 
-use SolutionORM\Interfaces\Cache;
+use SolutionORM\Interfaces\CacheInterface;
 
-class CacheMemcacheController implements Cache {
+class CacheMemcacheController implements CacheInterface {
 	private $memcache;
 	
 	function __construct(Memcache $memcache) {

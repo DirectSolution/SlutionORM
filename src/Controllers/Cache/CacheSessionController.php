@@ -2,9 +2,9 @@
 
 namespace SolutionORM\Controllers\Cache;
 
-use SolutionORM\Interfaces\Cache;
+use SolutionORM\Interfaces\CacheInterface;
 
-class CacheSessionController implements Cache {
+class CacheSessionController implements CacheInterface {
 
     function load($key) {
         if (!isset($_SESSION["solutionorm"][$key])) {

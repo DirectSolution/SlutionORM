@@ -2,8 +2,8 @@
 namespace SolutionORM;
 
 use SolutionORM\Controllers\AbstractController,
-    SolutionORM\Controllers\StructureController,
-    SolutionORM\Interfaces\CacheController,
+    SolutionORM\Interfaces\StructureInterface,
+    SolutionORM\Interfaces\CacheInterface,
     SolutionORM\Controllers\StructureConventionController;
 
 /** Database representation
@@ -20,7 +20,7 @@ class SolutionORM extends AbstractController {
 	* @param NotORM_Structure or null for new NotORM_Structure_Convention
 	* @param NotORM_Cache or null for no cache
 	*/
-	function __construct(PDO $connection, StructureController $structure = null, CacheController $cache = null) {
+	function __construct(PDO $connection, StructureInterface $structure = null, CacheInterface $cache = null) {
 
 		$this->connection = $connection;
 		$this->driver = $connection->getAttribute(PDO::ATTR_DRIVER_NAME);

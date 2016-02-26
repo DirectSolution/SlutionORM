@@ -2,9 +2,9 @@
 
 namespace SolutionORM\Controllers\Cache;
 
-use SolutionORM\Interfaces\Cache;
+use SolutionORM\Interfaces\CacheInterface;
 
-class CacheDatabaseController implements Cache {
+class CacheDatabaseController implements CacheInterface {
 
     private $connection;
 

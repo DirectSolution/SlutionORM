@@ -2,9 +2,9 @@
 
 namespace SolutionORM\Controllers\Cache;
 
-use SolutionORM\Interfaces\Cache;
+use SolutionORM\Interfaces\CacheInterface;
 
-class CacheAPCController implements Cache {
+class CacheAPCController implements CacheInterface {
 	
 	function load($key) {
 		$return = apc_fetch("solutionorm.$key", $success);
