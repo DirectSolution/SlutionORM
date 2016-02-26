@@ -3,39 +3,6 @@ namespace SolutionORM;
 
 use SolutionORM\Source;
 
-if (!interface_exists('JsonSerializable')) {
-	interface JsonSerializable {
-		function jsonSerialize();
-	}
-}
-
-include_once dirname(__FILE__) . "/NotORM/Structure.php";
-include_once dirname(__FILE__) . "/NotORM/Cache.php";
-include_once dirname(__FILE__) . "/NotORM/Literal.php";
-include_once dirname(__FILE__) . "/NotORM/Result.php";
-include_once dirname(__FILE__) . "/NotORM/MultiResult.php";
-include_once dirname(__FILE__) . "/NotORM/Row.php";
-
-
-
-// friend visibility emulation
-abstract class ORMAbstract {
-	protected $connection, $driver, $structure, $cache;
-	protected $solutionORM, $table, $primary, $rows, $referenced = array();
-	
-	protected $debug = false;
-	protected $debugTimer;
-	protected $freeze = false;
-	protected $rowClass = 'Row';
-	protected $jsonAsArray = false;
-	
-	protected function access($key, $delete = false) {
-	}
-	
-}
-
-
-
 /** Database representation
 * @property-write mixed $debug = false Enable debugging queries, true for error_log($query), callback($query, $parameters) otherwise
 * @property-write bool $freeze = false Disable persistence
@@ -43,7 +10,7 @@ abstract class ORMAbstract {
 * @property-write bool $jsonAsArray = false Use array instead of object in Result JSON serialization
 * @property-write string $transaction Assign 'BEGIN', 'COMMIT' or 'ROLLBACK' to start or stop transaction
 */
-class SolutionORM extends ORMAbstract {
+class Solution extends Source\ORMAbstract {
 	
 	/** Create database representation
 	* @param PDO
@@ -51,6 +18,7 @@ class SolutionORM extends ORMAbstract {
 	* @param NotORM_Cache or null for no cache
 	*/
 	function __construct(PDO $connection, Structure $structure = null, Cache $cache = null) {
+
 		$this->connection = $connection;
 		$this->driver = $connection->getAttribute(PDO::ATTR_DRIVER_NAME);
 		if (!isset($structure)) {
