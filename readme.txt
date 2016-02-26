@@ -1,12 +1,12 @@
-NotORM - http://www.notorm.com/
-
-NotORM is a PHP library for simple working with data in the database. The most interesting feature is a very easy work with table relationships. The overall performance is also very important and NotORM can actually run faster than a native driver.
 
 Requirements:
 PHP 5.1+
 any database supported by PDO (tested with MySQL, SQLite, PostgreSQL, MS SQL, Oracle)
 
 Usage:
+
+This all needs chnaging have changed everything to be namespaced, also using composer Autoloader by default...
+
 <?php
 include "NotORM.php";
 $connection = new PDO("mysql:dbname=software");
