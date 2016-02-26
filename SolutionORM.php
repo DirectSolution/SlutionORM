@@ -1,11 +1,7 @@
 <?php
-/** NotORM - simple reading data from the database
-* @link http://www.notorm.com/
-* @author Jakub Vrana, http://www.vrana.cz/
-* @copyright 2010 Jakub Vrana
-* @license http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
-* @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License, version 2 (one or other)
-*/
+namespace SolutionORM;
+
+use SolutionORM\Source;
 
 if (!interface_exists('JsonSerializable')) {
 	interface JsonSerializable {
@@ -23,14 +19,14 @@ include_once dirname(__FILE__) . "/NotORM/Row.php";
 
 
 // friend visibility emulation
-abstract class NotORM_Abstract {
+abstract class ORMAbstract {
 	protected $connection, $driver, $structure, $cache;
-	protected $notORM, $table, $primary, $rows, $referenced = array();
+	protected $solutionORM, $table, $primary, $rows, $referenced = array();
 	
 	protected $debug = false;
 	protected $debugTimer;
 	protected $freeze = false;
-	protected $rowClass = 'NotORM_Row';
+	protected $rowClass = 'Row';
 	protected $jsonAsArray = false;
 	
 	protected function access($key, $delete = false) {
@@ -47,18 +43,18 @@ abstract class NotORM_Abstract {
 * @property-write bool $jsonAsArray = false Use array instead of object in Result JSON serialization
 * @property-write string $transaction Assign 'BEGIN', 'COMMIT' or 'ROLLBACK' to start or stop transaction
 */
-class NotORM extends NotORM_Abstract {
+class SolutionORM extends ORMAbstract {
 	
 	/** Create database representation
 	* @param PDO
 	* @param NotORM_Structure or null for new NotORM_Structure_Convention
 	* @param NotORM_Cache or null for no cache
 	*/
-	function __construct(PDO $connection, NotORM_Structure $structure = null, NotORM_Cache $cache = null) {
+	function __construct(PDO $connection, Structure $structure = null, Cache $cache = null) {
 		$this->connection = $connection;
 		$this->driver = $connection->getAttribute(PDO::ATTR_DRIVER_NAME);
 		if (!isset($structure)) {
-			$structure = new NotORM_Structure_Convention;
+			$structure = new StructureConvention;
 		}
 		$this->structure = $structure;
 		$this->cache = $cache;
@@ -69,7 +65,7 @@ class NotORM extends NotORM_Abstract {
 	* @return NotORM_Result
 	*/
 	function __get($table) {
-		return new NotORM_Result($this->structure->getReferencingTable($table, ''), $this, true);
+		return new Result($this->structure->getReferencingTable($table, ''), $this, true);
 	}
 	
 	/** Set write-only properties
@@ -94,7 +90,7 @@ class NotORM extends NotORM_Abstract {
 	* @return NotORM_Result
 	*/
 	function __call($table, array $where) {
-		$return = new NotORM_Result($this->structure->getReferencingTable($table, ''), $this);
+		$return = new Result($this->structure->getReferencingTable($table, ''), $this);
 		if ($where) {
 			call_user_func_array(array($return, 'where'), $where);
 		}

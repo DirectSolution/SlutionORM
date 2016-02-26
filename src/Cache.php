@@ -1,8 +1,8 @@
 <?php
-
+namespace SolutionORM\Source;
 /** Loading and saving data, it's only cache so load() does not need to block until save()
 */
-interface NotORM_Cache {
+interface Cache {
 	
 	/** Load stored data
 	* @param string
@@ -23,17 +23,17 @@ interface NotORM_Cache {
 
 /** Cache using $_SESSION["NotORM"]
 */
-class NotORM_Cache_Session implements NotORM_Cache {
+class CacheSession implements Cache {
 	
 	function load($key) {
-		if (!isset($_SESSION["NotORM"][$key])) {
+		if (!isset($_SESSION["solutionorm"][$key])) {
 			return null;
 		}
-		return $_SESSION["NotORM"][$key];
+		return $_SESSION["solutionorm"][$key];
 	}
 	
 	function save($key, $data) {
-		$_SESSION["NotORM"][$key] = $data;
+		$_SESSION["solutionorm"][$key] = $data;
 	}
 	
 }
@@ -42,7 +42,7 @@ class NotORM_Cache_Session implements NotORM_Cache {
 
 /** Cache using file
 */
-class NotORM_Cache_File implements NotORM_Cache {
+class CacheFile implements Cache {
 	private $filename, $data = array();
 	
 	function __construct($filename) {
@@ -70,7 +70,7 @@ class NotORM_Cache_File implements NotORM_Cache {
 
 /** Cache using PHP include
 */
-class NotORM_Cache_Include implements NotORM_Cache {
+class CacheInclude implements Cache {
 	private $filename, $data = array();
 	
 	function __construct($filename) {
@@ -101,7 +101,7 @@ class NotORM_Cache_Include implements NotORM_Cache {
 
 /** Cache storing data to the "notorm" table in database
 */
-class NotORM_Cache_Database implements NotORM_Cache {
+class CacheDatabase implements Cache {
 	private $connection;
 	
 	function __construct(PDO $connection) {
@@ -109,7 +109,7 @@ class NotORM_Cache_Database implements NotORM_Cache {
 	}
 	
 	function load($key) {
-		$result = $this->connection->prepare("SELECT data FROM notorm WHERE id = ?");
+		$result = $this->connection->prepare("SELECT data FROM solutionorm WHERE id = ?");
 		$result->execute(array($key));
 		$return = $result->fetchColumn();
 		if (!$return) {
@@ -121,10 +121,10 @@ class NotORM_Cache_Database implements NotORM_Cache {
 	function save($key, $data) {
 		// REPLACE is not supported by PostgreSQL and MS SQL
 		$parameters = array(serialize($data), $key);
-		$result = $this->connection->prepare("UPDATE notorm SET data = ? WHERE id = ?");
+		$result = $this->connection->prepare("UPDATE solutionorm SET data = ? WHERE id = ?");
 		$result->execute($parameters);
 		if (!$result->rowCount()) {
-			$result = $this->connection->prepare("INSERT INTO notorm (data, id) VALUES (?, ?)");
+			$result = $this->connection->prepare("INSERT INTO solutionorm (data, id) VALUES (?, ?)");
 			try {
 				@$result->execute($parameters); // @ - ignore duplicate key error
 			} catch (PDOException $e) {
@@ -145,7 +145,7 @@ class NotORM_Cache_Database implements NotORM_Cache {
 
 /** Cache using "NotORM." prefix in Memcache
 */
-class NotORM_Cache_Memcache implements NotORM_Cache {
+class CacheMemcache implements Cache {
 	private $memcache;
 	
 	function __construct(Memcache $memcache) {
@@ -153,7 +153,7 @@ class NotORM_Cache_Memcache implements NotORM_Cache {
 	}
 	
 	function load($key) {
-		$return = $this->memcache->get("NotORM.$key");
+		$return = $this->memcache->get("solutionorm.$key");
 		if ($return === false) {
 			return null;
 		}
@@ -161,7 +161,7 @@ class NotORM_Cache_Memcache implements NotORM_Cache {
 	}
 	
 	function save($key, $data) {
-		$this->memcache->set("NotORM.$key", $data);
+		$this->memcache->set("solutionorm.$key", $data);
 	}
 	
 }
@@ -170,10 +170,10 @@ class NotORM_Cache_Memcache implements NotORM_Cache {
 
 /** Cache using "NotORM." prefix in APC
 */
-class NotORM_Cache_APC implements NotORM_Cache {
+class CacheAPC implements Cache {
 	
 	function load($key) {
-		$return = apc_fetch("NotORM.$key", $success);
+		$return = apc_fetch("solutionorm.$key", $success);
 		if (!$success) {
 			return null;
 		}
@@ -181,7 +181,7 @@ class NotORM_Cache_APC implements NotORM_Cache {
 	}
 	
 	function save($key, $data) {
-		apc_store("NotORM.$key", $data);
+		apc_store("solutionorm.$key", $data);
 	}
 	
 }

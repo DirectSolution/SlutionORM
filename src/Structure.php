@@ -1,8 +1,8 @@
 <?php
-
+namespace SolutionORM\Source;
 /** Information about tables and columns structure
 */
-interface NotORM_Structure {
+interface Structure {
 	
 	/** Get primary key of a table in $db->$table()
 	* @param string
@@ -50,7 +50,7 @@ interface NotORM_Structure {
 
 /** Structure described by some rules
 */
-class NotORM_Structure_Convention implements NotORM_Structure {
+class StructureConvention implements Structure {
 	protected $primary, $foreign, $table, $prefix;
 	
 	/** Create conventional structure
@@ -103,7 +103,7 @@ class NotORM_Structure_Convention implements NotORM_Structure {
 
 /** Structure reading meta-informations from the database
 */
-class NotORM_Structure_Discovery implements NotORM_Structure {
+class StructureDiscovery implements Structure {
 	protected $connection, $cache, $structure = array();
 	protected $foreign;
 	
@@ -112,7 +112,7 @@ class NotORM_Structure_Discovery implements NotORM_Structure {
 	* @param NotORM_Cache
 	* @param string use "%s_id" to access $name . "_id" column in $row->$name
 	*/
-	function __construct(PDO $connection, NotORM_Cache $cache = null, $foreign = '%s') {
+	function __construct(PDO $connection, Cache $cache = null, $foreign = '%s') {
 		$this->connection = $connection;
 		$this->cache = $cache;
 		$this->foreign = $foreign;

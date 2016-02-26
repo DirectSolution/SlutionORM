@@ -1,10 +1,10 @@
 <?php
-
+namespace SolutionORM\Source;
 /** Filtered table representation
 * @method NotORM_Result and(mixed $condition, mixed $parameters = array()) Add AND condition
 * @method NotORM_Result or(mixed $condition, mixed $parameters = array()) Add OR condition
 */
-class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Countable, JsonSerializable {
+class Result extends OrmAbstract implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	protected $single;
 	protected $select = array(), $conditions = array(), $where = array(), $parameters = array(), $order = array(), $limit = null, $offset = null, $group = "", $having = "", $lock = null;
 	protected $union = array(), $unionOrder = array(), $unionLimit = null, $unionOffset = null;
@@ -16,22 +16,22 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 	* @param bool single row
 	* @access protected must be public because it is called from NotORM
 	*/
-	function __construct($table, NotORM $notORM, $single = false) {
+	function __construct($table, SolutionORM $solutionORM, $single = false) {
 		$this->table = $table;
-		$this->notORM = $notORM;
+		$this->solutionORM = $solutionORM;
 		$this->single = $single;
-		$this->primary = $notORM->structure->getPrimary($table);
+		$this->primary = $solutionORM->structure->getPrimary($table);
 	}
 	
 	/** Save data to cache and empty result
 	*/
 	function __destruct() {
-		if ($this->notORM->cache && !$this->select && isset($this->rows)) {
+		if ($this->solutionORM->cache && !$this->select && isset($this->rows)) {
 			$access = $this->access;
 			if (is_array($access)) {
 				$access = array_filter($access);
 			}
-			$this->notORM->cache->save("$this->table;" . implode(",", $this->conditions), $access);
+			$this->solutionORM->cache->save("$this->table;" . implode(",", $this->conditions), $access);
 		}
 		$this->rows = null;
 		unset($this->data);
@@ -39,7 +39,7 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 	
 	protected function limitString($limit, $offset = null) {
 		$return = "";
-		if (isset($limit) && $this->notORM->driver != "oci" && $this->notORM->driver != "dblib" && $this->notORM->driver != "mssql" && $this->notORM->driver != "sqlsrv") {
+		if (isset($limit) && $this->solutionORM->driver != "oci" && $this->solutionORM->driver != "dblib" && $this->solutionORM->driver != "mssql" && $this->solutionORM->driver != "sqlsrv") {
 			$return .= " LIMIT $limit";
 			if ($offset) {
 				$return .= " OFFSET $offset";
@@ -66,7 +66,7 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 		$return = $this->removeExtraDots($return);
 		
 		$where = $this->where;
-		if (isset($this->limit) && $this->notORM->driver == "oci") {
+		if (isset($this->limit) && $this->solutionORM->driver == "oci") {
 			$where[] = ($where ? " AND " : "") . "(" . ($this->offset ? "rownum > $this->offset AND " : "") . "rownum <= " . ($this->limit + $this->offset) . ")"; //! rownum > doesn't work - requires subselect (see adminer/drivers/oracle.inc.php)
 		}
 		if ($where) {
@@ -81,7 +81,7 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 	}
 	
 	protected function topString($limit, $offset = null) {
-		if (isset($limit) && ($this->notORM->driver == "dblib" || $this->notORM->driver == "mssql" || $this->notORM->driver == "sqlsrv")) {
+		if (isset($limit) && ($this->solutionORM->driver == "dblib" || $this->solutionORM->driver == "mssql" || $this->solutionORM->driver == "sqlsrv")) {
 			return " TOP ($this->limit)"; //! offset is not supported
 		}
 		return "";
@@ -96,9 +96,9 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 				preg_match_all('~\\b([a-z_][a-z0-9_]*)([.:])~i', $names, $matches, PREG_SET_ORDER);
 				foreach ($matches as $match) {
 					list(, $name, $delimiter) = $match;
-					$table = $this->notORM->structure->getReferencedTable($name, $parent);
-					$column = ($delimiter == ':' ? $this->notORM->structure->getPrimary($parent) : $this->notORM->structure->getReferencedColumn($name, $parent));
-					$primary = ($delimiter == ':' ? $this->notORM->structure->getReferencedColumn($parent, $table) : $this->notORM->structure->getPrimary($table));
+					$table = $this->solutionORM->structure->getReferencedTable($name, $parent);
+					$column = ($delimiter == ':' ? $this->solutionORM->structure->getPrimary($parent) : $this->solutionORM->structure->getReferencedColumn($name, $parent));
+					$primary = ($delimiter == ':' ? $this->solutionORM->structure->getReferencedColumn($parent, $table) : $this->solutionORM->structure->getPrimary($table));
 					$return[$name] = " LEFT JOIN $table" . ($table != $name ? " AS $name" : "") . " ON $parent.$column = $name.$primary"; // should use alias if the table is used on more places
 					$parent = $name;
 				}
@@ -113,8 +113,8 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 	function __toString() {
 		$return = "SELECT" . $this->topString($this->limit, $this->offset) . " ";
 		$join = $this->createJoins(implode(",", $this->conditions) . "," . implode(",", $this->select) . ",$this->group,$this->having," . implode(",", $this->order));
-		if (!isset($this->rows) && $this->notORM->cache && !is_string($this->accessed)) {
-			$this->accessed = $this->notORM->cache->load("$this->table;" . implode(",", $this->conditions));
+		if (!isset($this->rows) && $this->solutionORM->cache && !is_string($this->accessed)) {
+			$this->accessed = $this->solutionORM->cache->load("$this->table;" . implode(",", $this->conditions));
 			$this->access = $this->accessed;
 		}
 		if ($this->select) {
@@ -126,7 +126,7 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 		}
 		$return .= " FROM $this->table" . implode($join) . $this->whereString();
 		if ($this->union) {
-			$return = ($this->notORM->driver == "sqlite" || $this->notORM->driver == "oci" ? $return : "($return)") . implode($this->union);
+			$return = ($this->solutionORM->driver == "sqlite" || $this->solutionORM->driver == "oci" ? $return : "($return)") . implode($this->union);
 			if ($this->unionOrder) {
 				$return .= " ORDER BY " . implode(", ", $this->unionOrder);
 			}
@@ -140,8 +140,8 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 	}
 	
 	protected function query($query, $parameters) {
-		if ($this->notORM->debug) {
-			if (!is_callable($this->notORM->debug)) {
+		if ($this->solutionORM->debug) {
+			if (!is_callable($this->solutionORM->debug)) {
 				$debug = "$query;";
 				if ($parameters) {
 					$debug .= " -- " . implode(", ", array_map(array($this, 'quote'), $parameters));
@@ -153,16 +153,16 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 					}
 				}
 				error_log("$backtrace[file]:$backtrace[line]:$debug\n", 0);
-			} elseif (call_user_func($this->notORM->debug, $query, $parameters) === false) {
+			} elseif (call_user_func($this->solutionORM->debug, $query, $parameters) === false) {
 				return false;
 			}
 		}
-		$return = $this->notORM->connection->prepare($query);
+		$return = $this->solutionORM->connection->prepare($query);
 		if (!$return || !$return->execute(array_map(array($this, 'formatValue'), $parameters))) {
 			$return = false;
 		}
-		if ($this->notORM->debugTimer) {
-			call_user_func($this->notORM->debugTimer);
+		if ($this->solutionORM->debugTimer) {
+			call_user_func($this->solutionORM->debugTimer);
 		}
 		return $return;
 	}
@@ -188,10 +188,10 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 		if ($val === false) {
 			return "0";
 		}
-		if (is_int($val) || $val instanceof NotORM_Literal) { // number or SQL code - for example "NOW()"
+		if (is_int($val) || $val instanceof Literal) { // number or SQL code - for example "NOW()"
 			return (string) $val;
 		}
-		return $this->notORM->connection->quote($val);
+		return $this->solutionORM->connection->quote($val);
 	}
 	
 	/** Shortcut for call_user_func_array(array($this, 'insert'), $rows)
@@ -199,7 +199,7 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 	* @return int number of affected rows or false in case of an error
 	*/
 	function insert_multi(array $rows) {
-		if ($this->notORM->freeze) {
+		if ($this->solutionORM->freeze) {
 			return false;
 		}
 		if (!$rows) {
@@ -207,7 +207,7 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 		}
 		$data = reset($rows);
 		$parameters = array();
-		if ($data instanceof NotORM_Result) {
+		if ($data instanceof Result) {
 			$parameters = $data->parameters; //! other parameters
 			$data = (string) $data;
 		} elseif ($data instanceof Traversable) {
@@ -222,13 +222,13 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 				}
 				$values[] = $this->quote($value);
 				foreach ($value as $val) {
-					if ($val instanceof NotORM_Literal && $val->parameters) {
+					if ($val instanceof Literal && $val->parameters) {
 						$parameters = array_merge($parameters, $val->parameters);
 					}
 				}
 			}
 			//! driver specific extended insert
-			$insert = ($data || $this->notORM->driver == "mysql"
+			$insert = ($data || $this->solutionORM->driver == "mysql"
 				? "(" . implode(", ", array_keys($data)) . ") VALUES " . implode(", ", $values)
 				: "DEFAULT VALUES"
 			);
@@ -256,10 +256,10 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 		if (!is_array($data)) {
 			return $return;
 		}
-		if (!isset($data[$this->primary]) && ($id = $this->notORM->connection->lastInsertId($this->notORM->structure->getSequence($this->table)))) {
+		if (!isset($data[$this->primary]) && ($id = $this->solutionORM->connection->lastInsertId($this->solutionORM->structure->getSequence($this->table)))) {
 			$data[$this->primary] = $id;
 		}
-		return new $this->notORM->rowClass($data, $this);
+		return new $this->solutionORM->rowClass($data, $this);
 	}
 	
 	/** Update all rows in result set
@@ -267,7 +267,7 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 	* @return int number of affected rows or false in case of an error
 	*/
 	function update(array $data) {
-		if ($this->notORM->freeze) {
+		if ($this->solutionORM->freeze) {
 			return false;
 		}
 		if (!$data) {
@@ -278,7 +278,7 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 		foreach ($data as $key => $val) {
 			// doesn't use binding because $this->parameters can be filled by ? or :name
 			$values[] = "$key = " . $this->quote($val);
-			if ($val instanceof NotORM_Literal && $val->parameters) {
+			if ($val instanceof Literal && $val->parameters) {
 				$parameters = array_merge($parameters, $val->parameters);
 			}
 		}
@@ -306,7 +306,7 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 		$insert = $unique + $insert;
 		$values = "(" . implode(", ", array_keys($insert)) . ") VALUES " . $this->quote($insert);
 		//! parameters
-		if ($this->notORM->driver == "mysql") {
+		if ($this->solutionORM->driver == "mysql") {
 			$set = array();
 			if (!$update) {
 				$update = $unique;
@@ -317,7 +317,7 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 			}
 			return $this->insert("$values ON DUPLICATE KEY UPDATE " . implode(", ", $set));
 		} else {
-			$connection = $this->notORM->connection;
+			$connection = $this->solutionORM->connection;
 			$errorMode = $connection->getAttribute(PDO::ATTR_ERRMODE);
 			$connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 			try {
@@ -347,14 +347,14 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 	* @return string number
 	*/
 	function insert_id() {
-		return $this->notORM->connection->lastInsertId();
+		return $this->solutionORM->connection->lastInsertId();
 	}
 	
 	/** Delete all rows in result set
 	* @return int number of affected rows or false in case of an error
 	*/
 	function delete() {
-		if ($this->notORM->freeze) {
+		if ($this->solutionORM->freeze) {
 			return false;
 		}
 		$return = $this->query("DELETE" . $this->topString($this->limit, $this->offset) . " FROM $this->table" . $this->whereString(), $this->parameters);
@@ -411,13 +411,13 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 			$this->parameters = array_merge($this->parameters, $parameters);
 		} elseif ($parameters === null) { // where("column", null)
 			$condition .= " IS NULL";
-		} elseif ($parameters instanceof NotORM_Result) { // where("column", $db->$table())
+		} elseif ($parameters instanceof Result) { // where("column", $db->$table())
 			$clone = clone $parameters;
 			if (!$clone->select) {
-				$clone->select($this->notORM->structure->getPrimary($clone->table));
+				$clone->select($this->solutionORM->structure->getPrimary($clone->table));
 			}
-			if ($this->notORM->driver != "mysql") {
-				if ($clone instanceof NotORM_MultiResult) {
+			if ($this->solutionORM->driver != "mysql") {
+				if ($clone instanceof MultiResult) {
 					array_shift($clone->select);
 					$clone->single();
 				}
@@ -427,7 +427,7 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 				$in = array();
 				foreach ($clone as $row) {
 					$row = array_values(iterator_to_array($row));
-					if ($clone instanceof NotORM_MultiResult && count($row) > 1) {
+					if ($clone instanceof MultiResult && count($row) > 1) {
 						array_shift($row);
 					}
 					if (count($row) == 1) {
@@ -457,7 +457,7 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 	protected function whereIn($condition, $parameters) {
 		if (!$parameters) {
 			$condition = "($condition) IS NOT NULL AND $condition IS NULL";
-		} elseif ($this->notORM->driver != "oci") {
+		} elseif ($this->solutionORM->driver != "oci") {
 			$column = $condition;
 			$condition .= " IN " . $this->quote($parameters);
 			$nulls = array_filter($parameters, 'is_null');
@@ -481,7 +481,7 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 			case "OR":
 				return $this->whereOperator($operator, $args);
 		}
-		trigger_error("Call to undefined method NotORM_Result::$name()", E_USER_ERROR);
+		trigger_error("Call to undefined method Result::$name()", E_USER_ERROR);
 	}
 	
 	/** Shortcut for where()
@@ -562,8 +562,8 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 	* @param bool
 	* @return NotORM_Result fluent interface
 	*/
-	function union(NotORM_Result $result, $all = false) {
-		$this->union[] = " UNION " . ($all ? "ALL " : "") . ($this->notORM->driver == "sqlite" || $this->notORM->driver == "oci" ? $result : "($result)");
+	function union(Result $result, $all = false) {
+		$this->union[] = " UNION " . ($all ? "ALL " : "") . ($this->solutionORM->driver == "sqlite" || $this->solutionORM->driver == "oci" ? $result : "($result)");
 		$this->parameters = array_merge($this->parameters, $result->parameters);
 		return $this;
 	}
@@ -628,7 +628,7 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 			$exception = null;
 			$parameters = array();
 			foreach (array_merge($this->select, array($this, $this->group, $this->having), $this->order, $this->unionOrder) as $val) {
-				if (($val instanceof NotORM_Literal || $val instanceof self) && $val->parameters) {
+				if (($val instanceof Literal || $val instanceof self) && $val->parameters) {
 					$parameters = array_merge($parameters, $val->parameters);
 				}
 			}
@@ -656,7 +656,7 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 							$this->access[$this->primary] = true;
 						}
 					}
-					$this->rows[$key] = new $this->notORM->rowClass($row, $this);
+					$this->rows[$key] = new $this->solutionORM->rowClass($row, $this);
 				}
 			}
 			$this->data = $this->rows;
@@ -696,7 +696,7 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 		}
 		foreach ($clone as $row) {
 			$values = array_values(iterator_to_array($row));
-			if ($value != "" && $clone instanceof NotORM_MultiResult) {
+			if ($value != "" && $clone instanceof MultiResult) {
 				array_shift($values);
 			}
 			$return[(string) $values[0]] = ($value != "" ? $values[(array_key_exists(1, $values) ? 1 : 0)] : $row); // isset($values[1]) - fetchPairs("id", "id")
@@ -820,7 +820,7 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 	
 	function jsonSerialize() {
 		$this->execute();
-		if ($this->notORM->jsonAsArray) {
+		if ($this->solutionORM->jsonAsArray) {
 			return array_values($this->data);
 		} else {
 			return $this->data;

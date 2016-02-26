@@ -1,16 +1,17 @@
 {
-	"name": "vrana/notorm",
-	"description": "NotORM is a PHP library for simple working with data in the database.",
-	"keywords": ["database", "dbal"],
-	"homepage": "http://www.notorm.com/",
-	"license": ["Apache-2.0", "GPL-2.0+"],
-	"authors": [
-		{
-			"name": "Jakub Vrána",
-			"homepage": "http://www.vrana.cz/"
-		}
-	],
-	"autoload": {
-		"files": ["NotORM.php"]
-	}
+    "name": "directsolution/solution-orm",
+    "description": "SolutionORM, forked modernised version of NotOrm.",
+    "keywords": ["database", "dbal"],
+    "authors": [
+        {
+            "name": "Doug Hayward"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "SolutionORM\\": "",
+            "SolutionMvc\\Source\\": "src/"
+        }
+
+    }
 }

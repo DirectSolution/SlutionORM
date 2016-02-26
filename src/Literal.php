@@ -1,8 +1,8 @@
 <?php
-
+namespace SolutionORM\Source;
 /** SQL literal value
 */
-class NotORM_Literal {
+class Literal {
 	protected $value = '';
 	
 	/** @var array */
