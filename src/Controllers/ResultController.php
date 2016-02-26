@@ -1,11 +1,10 @@
 <?php
-namespace SolutionORM\Source;
-/** Filtered table representation
-* @method NotORM_Result and(mixed $condition, mixed $parameters = array()) Add AND condition
-* @method NotORM_Result or(mixed $condition, mixed $parameters = array()) Add OR condition
-*/
-class Result extends OrmAbstract implements Iterator, ArrayAccess, Countable, JsonSerializable {
-	protected $single;
+
+namespace SolutionORM\Controllers;
+
+
+class ResultController extends AbstractController implements Iterator, ArrayAccess, Countable, JsonSerializable{
+   protected $single;
 	protected $select = array(), $conditions = array(), $where = array(), $parameters = array(), $order = array(), $limit = null, $offset = null, $group = "", $having = "", $lock = null;
 	protected $union = array(), $unionOrder = array(), $unionLimit = null, $unionOffset = null;
 	protected $data, $referencing = array(), $aggregation = array(), $accessed, $access, $keys = array();
@@ -168,7 +167,7 @@ class Result extends OrmAbstract implements Iterator, ArrayAccess, Countable, Js
 	}
 	
 	protected function formatValue($val) {
-		if ($val instanceof DateTime) {
+		if ($val instanceof \DateTime) {
 			return $val->format("Y-m-d H:i:s"); //! may be driver specific
 		}
 		return $val;
@@ -826,5 +825,4 @@ class Result extends OrmAbstract implements Iterator, ArrayAccess, Countable, Js
 			return $this->data;
 		}
 	}
-	
 }

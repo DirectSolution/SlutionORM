@@ -10,7 +10,8 @@
     "autoload": {
         "psr-4": {
             "SolutionORM\\": "",
-            "SolutionMvc\\Source\\": "src/"
+            "SolutionORM\\Controllers\\": "src/Controllers/",
+            "SolutionORM\\Interfaces\\": "src/Interfaces/"
         }
 
     }

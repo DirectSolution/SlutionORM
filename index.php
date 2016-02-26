@@ -1,5 +1,5 @@
 <?php
-use SolutionORM\Solution;
+use SolutionORM\SolutionORM;
 if (!interface_exists('JsonSerializable')) {
 	interface JsonSerializable {
 		function jsonSerialize();
@@ -8,4 +8,4 @@ if (!interface_exists('JsonSerializable')) {
 require_once dirname(__FILE__) . "/vendor/autoload.php";
 ini_set('display_errors', 'On');
 error_reporting(E_ALL);
-new Solution();
+new SolutionORM();

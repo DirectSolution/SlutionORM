@@ -1,7 +1,10 @@
 <?php
 namespace SolutionORM;
 
-use SolutionORM\Source;
+use SolutionORM\Controllers\AbstractController,
+    SolutionORM\Controllers\StructureController,
+    SolutionORM\Interfaces\CacheController,
+    SolutionORM\Controllers\StructureConventionController;
 
 /** Database representation
 * @property-write mixed $debug = false Enable debugging queries, true for error_log($query), callback($query, $parameters) otherwise
@@ -10,19 +13,19 @@ use SolutionORM\Source;
 * @property-write bool $jsonAsArray = false Use array instead of object in Result JSON serialization
 * @property-write string $transaction Assign 'BEGIN', 'COMMIT' or 'ROLLBACK' to start or stop transaction
 */
-class Solution extends Source\ORMAbstract {
+class SolutionORM extends AbstractController {
 	
 	/** Create database representation
 	* @param PDO
 	* @param NotORM_Structure or null for new NotORM_Structure_Convention
 	* @param NotORM_Cache or null for no cache
 	*/
-	function __construct(PDO $connection, Structure $structure = null, Cache $cache = null) {
+	function __construct(PDO $connection, StructureController $structure = null, CacheController $cache = null) {
 
 		$this->connection = $connection;
 		$this->driver = $connection->getAttribute(PDO::ATTR_DRIVER_NAME);
 		if (!isset($structure)) {
-			$structure = new StructureConvention;
+			$structure = new StructureConventionController;
 		}
 		$this->structure = $structure;
 		$this->cache = $cache;

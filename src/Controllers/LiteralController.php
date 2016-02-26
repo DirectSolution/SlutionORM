@@ -1,9 +1,9 @@
 <?php
-namespace SolutionORM\Source;
-/** SQL literal value
-*/
-class Literal {
-	protected $value = '';
+
+namespace SolutionORM\Controllers;
+
+class LiteralController {
+   	protected $value = '';
 	
 	/** @var array */
 	public $parameters = array();
@@ -25,5 +25,4 @@ class Literal {
 	function __toString() {
 		return $this->value;
 	}
-	
 }

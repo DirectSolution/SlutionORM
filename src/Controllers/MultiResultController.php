@@ -1,9 +1,11 @@
 <?php
-namespace SolutionORM\Source;
-/** Representation of filtered table grouped by some column
-*/
-class MultiResult extends Result {
-	private $result, $column, $active;
+
+namespace SolutionORM\Controllers;
+
+use SolutionORM\Controllers\ResultController;
+
+class MultiResultController extends ResultController{
+   	private $result, $column, $active;
 	
 	/** @access protected must be public because it is called from Row */
 	function __construct($table, Result $result, $column, $active) {
@@ -139,5 +141,4 @@ class MultiResult extends Result {
 			}
 		}
 	}
-	
 }
