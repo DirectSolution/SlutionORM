@@ -1,5 +1,5 @@
 {
-    "name": "DirectSolution/SolutionORM",
+    "name": "direct-solution/solution-orm",
     "description": "SolutionORM, forked modernised version of NotOrm.",
     "keywords": ["database", "dbal"],
     "authors": [
