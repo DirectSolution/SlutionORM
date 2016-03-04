@@ -8,7 +8,7 @@ use SolutionORM\Controllers\ResultController,
 
 /** Single row representation
  */
-class RowController extends AbstractController implements IteratorAggregate, ArrayAccess, Countable, JsonSerializable {
+class RowController extends AbstractController implements \IteratorAggregate, \ArrayAccess, \Countable, \JsonSerializable {
 
     private $modified = array();
     protected $row, $result, $primary;

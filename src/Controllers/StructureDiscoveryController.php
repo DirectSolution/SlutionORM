@@ -3,7 +3,8 @@
 namespace SolutionORM\Controllers;
 
 use SolutionORM\Interfaces\StructureInterface,
-    SolutionORM\Interfaces\CacheInterface;
+    SolutionORM\Interfaces\CacheInterface,
+        \PDO;
 
 class StructureDiscoveryController implements StructureInterface {
 

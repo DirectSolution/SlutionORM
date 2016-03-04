@@ -4,9 +4,11 @@ namespace SolutionORM\Controllers;
 
 use SolutionORM\Controllers\LiteralController,
     SolutionORM\Controllers\ResultController,
-    SolutionORM\Controllers\MultiResultController;
+    SolutionORM\Controllers\MultiResultController,
+    SolutionORM\Controllers\RowController,
+        PDO;
 
-class ResultController extends AbstractController implements Iterator, ArrayAccess, Countable, JsonSerializable {
+class ResultController extends AbstractController implements \Iterator, \ArrayAccess, \Countable, \JsonSerializable {
 
     protected $single;
     protected $select = array(), $conditions = array(), $where = array(), $parameters = array(), $order = array(), $limit = null, $offset = null, $group = "", $having = "", $lock = null;
@@ -19,7 +21,7 @@ class ResultController extends AbstractController implements Iterator, ArrayAcce
      * @param bool single row
      * @access protected must be public because it is called from NotORM
      */
-    function __construct($table, SolutionORM $solutionORM, $single = false) {
+    function __construct($table, $solutionORM, $single = false) {
         $this->table = $table;
         $this->solutionORM = $solutionORM;
         $this->single = $single;
@@ -655,7 +657,7 @@ class ResultController extends AbstractController implements Iterator, ArrayAcce
                             $this->access[$this->primary] = true;
                         }
                     }
-                    $this->rows[$key] = new $this->solutionORM->rowClass($row, $this);
+                    $this->rows[$key] = new RowController($row, $this);
                 }
             }
             $this->data = $this->rows;

@@ -6,6 +6,7 @@ use SolutionORM\Controllers\AbstractController,
     SolutionORM\Interfaces\StructureInterface,
     SolutionORM\Interfaces\CacheInterface,
     SolutionORM\Controllers\StructureConventionController,
+    SolutionORM\Controllers\ResultController,
     PDO;
 
 /** Database representation
@@ -38,7 +39,7 @@ class SolutionORM extends AbstractController {
      * @return NotORM_Result
      */
     function __get($table) {
-        return new Result($this->structure->getReferencingTable($table, ''), $this, true);
+        return new ResultController($this->structure->getReferencingTable($table, ''), $this, true);
     }
 
     /** Set write-only properties
@@ -63,7 +64,7 @@ class SolutionORM extends AbstractController {
      * @return NotORM_Result
      */
     function __call($table, array $where) {
-        $return = new Result($this->structure->getReferencingTable($table, ''), $this);
+        $return = new ResultController($this->structure->getReferencingTable($table, ''), $this);
         if ($where) {
             call_user_func_array(array($return, 'where'), $where);
         }
