@@ -262,7 +262,8 @@ class ResultController extends AbstractController implements \Iterator, \ArrayAc
         if (!isset($data[$this->primary]) && ($id = $this->solutionORM->connection->lastInsertId($this->solutionORM->structure->getSequence($this->table)))) {
             $data[$this->primary] = $id;
         }
-        return new RowController($data, $this);
+//        return new RowController($data, $this);
+        return;
     }
 
     /** Update all rows in result set
