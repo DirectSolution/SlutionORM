@@ -8,7 +8,8 @@ use SolutionORM\Controllers\LiteralController,
     SolutionORM\Controllers\RowController,
         PDO;
 
-class ResultController extends AbstractController implements \Iterator, \ArrayAccess, \Countable, \JsonSerializable {
+//class ResultController extends AbstractController implements \Iterator, \ArrayAccess, \Countable, \JsonSerializable {
+class ResultController extends AbstractController implements \Iterator, \ArrayAccess, \Countable {
 
     protected $single;
     protected $select = array(), $conditions = array(), $where = array(), $parameters = array(), $order = array(), $limit = null, $offset = null, $group = "", $having = "", $lock = null;
