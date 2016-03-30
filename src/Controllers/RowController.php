@@ -110,7 +110,7 @@ class RowController extends AbstractController implements \IteratorAggregate, \A
         if (!isset($data)) {
             $data = $this->modified;
         }
-        $result = new ResultController($this->result->table, $this->result->notORM);
+        $result = new ResultController($this->result->table, $this->result->solutionORM);
         $return = $result->where($this->result->primary, $this->primary)->update($data);
         $this->primary = $this[$this->result->primary];
         return $return;
