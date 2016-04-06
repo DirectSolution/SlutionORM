@@ -46,7 +46,7 @@ class RowController extends AbstractController implements \IteratorAggregate, \A
             }
             if ($keys) {
                 $table = $this->result->solutionORM->structure->getReferencedTable($name, $this->result->table);
-                $referenced = new Result($table, $this->result->solutionORM);
+                $referenced = new ResultController($table, $this->result->solutionORM);
                 $referenced->where("$table." . $this->result->solutionORM->structure->getPrimary($table), array_keys($keys));
             } else {
                 $referenced = array();
