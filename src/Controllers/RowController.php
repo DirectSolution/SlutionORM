@@ -138,7 +138,7 @@ class RowController extends AbstractController implements \IteratorAggregate, \A
 
     function getIterator() {
         $this->access(null);
-        return new ArrayIterator($this->row);
+        return new \ArrayIterator($this->row);
     }
 
     // Countable implementation
